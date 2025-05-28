@@ -1,0 +1,13 @@
+pandas
+pdfplumber
+requests
+python-dotenv
+openai==0.28.0
+XlsxWriter
+fastapi
+uvicorn
+fastapi-security
+fastapi-pagination
+fastapi-utils
+fastapi-plugins
+fastapi-cache
