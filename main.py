@@ -2,6 +2,7 @@ from fastapi import FastAPI, UploadFile, File, Request
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import os
+import uvicorn
 import shutil
 import uuid
 from merchant_risk_tool import run_pipeline  # Must return (clean_file, risk_file, logs)
@@ -60,3 +61,5 @@ async def download(filename: str):
         filename=filename,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
