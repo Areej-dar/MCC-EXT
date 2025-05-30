@@ -1,14 +1,16 @@
-from fastapi import FastAPI, UploadFile, File, Request
+from fastapi import FastAPI, UploadFile, File, Request, Query
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import os
 import uvicorn
 import shutil
 import uuid
+import requests
+from dotenv import load_dotenv
 from merchant_risk_tool import run_pipeline  # Must return (clean_file, risk_file, logs)
 
+load_dotenv()
 app = FastAPI()
-
 # Enable CORS for frontend access
 app.add_middleware(
     CORSMiddleware,
@@ -17,6 +19,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+GOOGLE_CSE_ID = os.getenv("GOOGLE_CSE_ID")
 
 UPLOAD_DIR = "uploads"
 OUTPUT_DIR = "outputs"
@@ -61,5 +66,17 @@ async def download(filename: str):
         filename=filename,
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
-if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    
+@app.get("/search_google")
+def search_google(q: str = Query(...)):
+    url = "https://www.googleapis.com/customsearch/v1"
+    params = {
+        "key": GOOGLE_API_KEY,
+        "cx": GOOGLE_CSE_ID,
+        "q": q
+    }
+    response = requests.get(url, params=params)
+    return response.json()
+
+# if __name__ == "__main__":
+#     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
