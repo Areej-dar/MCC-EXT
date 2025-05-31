@@ -2,6 +2,7 @@ from fastapi import FastAPI, UploadFile, File, Request, Query
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import os
+import openai
 import uvicorn
 import shutil
 import uuid
@@ -10,6 +11,7 @@ from dotenv import load_dotenv
 from merchant_risk_tool import run_pipeline  # Must return (clean_file, risk_file, logs)
 
 load_dotenv()
+
 app = FastAPI()
 # Enable CORS for frontend access
 app.add_middleware(
@@ -77,6 +79,55 @@ def search_google(q: str = Query(...)):
     }
     response = requests.get(url, params=params)
     return response.json()
+
+@app.get("/search_openai")
+def search_openai(q: str = Query(...)):
+    try:
+        system_prompt = """
+        You are a risk-analysis assistant for SadaPay.
+        Input: merchant name, country code.
+        Output *only* this JSON:
+        {
+        "risk_level":"Low|Medium|High",
+        "risk_score":0-100,
+        "website":"<inferred or provided domain or null>",
+        "summary":"one-sentence findings",
+        "business_nature":"Briefly explain what the merchant does or offers",
+        "reason":"brief rationale for the level",
+        "confidence":0-100
+        }
+        Rules:
+        1. If “domain” is empty, try to infer the merchant’s website and put it in `website`.
+        2. Blacklist if business involves: weapons, arms, adult content, gambling, scam, phishing, hacking, forex, crypto, trading, fundraising, charity, donations.
+        3. Base your score on:
+        • domain validity
+        • presence of pages: About Us, Contact Us, Privacy Policy, T&C, Refund Policy
+        • social links (Facebook, Twitter, LinkedIn, Instagram, YouTube)
+        • red-flag marketing terms
+        4. If you can’t infer a domain, set `"website": null` and say so in `summary`.
+        5. Tell the merchant category (e.g. “e-commerce”, “gaming”) in `summary`.
+        """.strip()
+
+        response = openai.ChatCompletion.create(
+            model="gpt-4",  # or "gpt-3.5-turbo"
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": q}
+            ],
+            temperature=0.3
+        )
+
+        return {
+            "results": [
+                {
+                    "title": "AI Risk Analysis",
+                    "description": response["choices"][0]["message"]["content"]
+                }
+            ]
+        }
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": str(e)})
+
 
 # if __name__ == "__main__":
 #     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

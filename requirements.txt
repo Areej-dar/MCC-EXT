@@ -11,3 +11,4 @@ fastapi-pagination
 fastapi-utils
 fastapi-plugins
 fastapi-cache
+python-multipart
