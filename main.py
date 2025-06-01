@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 from merchant_risk_tool import run_pipeline  # Must return (clean_file, risk_file, logs)
 
 load_dotenv()
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 app = FastAPI()
 # Enable CORS for frontend access
@@ -24,6 +25,7 @@ app.add_middleware(
 
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 GOOGLE_CSE_ID = os.getenv("GOOGLE_CSE_ID")
+
 
 UPLOAD_DIR = "uploads"
 OUTPUT_DIR = "outputs"
