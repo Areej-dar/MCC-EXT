@@ -12,3 +12,4 @@ fastapi-utils
 fastapi-plugins
 fastapi-cache
 python-multipart
+openpyxl
