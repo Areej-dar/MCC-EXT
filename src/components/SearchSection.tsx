@@ -62,7 +62,7 @@ export const SearchSection: React.FC<SearchSectionProps> = ({
             }`}
           >
             <Bot className="h-4 w-4 mr-2" />
-            Gemini Analysis
+            AI Search
           </button>
         </div>
 
@@ -99,17 +99,47 @@ export const SearchSection: React.FC<SearchSectionProps> = ({
                     ) : (
                       result.title
                     )}</h4>
-                  <span
+                    <span
                     className={`px-2 py-1 rounded text-xs ${
                       result.source === 'gemini'
-                        ? 'bg-purple-100 text-purple-700'
-                        : 'bg-blue-100 text-blue-700'
+                      ? 'bg-purple-100 text-purple-700'
+                      : 'bg-blue-100 text-blue-700'
                     }`}
-                  >
-                    {result.source === 'gemini' ? 'Gemini' : 'Google'}
-                  </span>
+                    >
+                    {result.source === 'gemini' ? 'AI' : 'Google'}
+                    </span>
                 </div>
-                <p className="text-sm text-gray-500">{result.description}</p>
+                {result.source === 'gemini' ? (() => {
+                    let parsed: any;
+                    try {
+                      parsed = JSON.parse(result.description);
+                    } catch {
+                      return <p className="text-sm text-gray-500 whitespace-pre-wrap">{result.description}</p>;
+                    }
+
+                    return (
+                      <div className="text-sm text-gray-700 space-y-2">
+                        <p><strong>Risk Level:</strong> {parsed.risk_level}</p>
+                        <p><strong>Risk Score:</strong> {parsed.risk_score}</p>
+                        <p>
+                          <strong>Website:</strong>{' '}
+                          {parsed.website ? (
+                            <a href={parsed.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
+                              {parsed.website}
+                            </a>
+                          ) : (
+                            'N/A'
+                          )}
+                        </p>
+                        <p><strong>Summary:</strong> {parsed.summary}</p>
+                        <p><strong>Business Nature:</strong> {parsed.business_nature}</p>
+                        <p><strong>Reason:</strong> {parsed.reason}</p>
+                        <p><strong>Confidence:</strong> {parsed.confidence}</p>
+                      </div>
+                    );
+                  })() : (
+                    <p className="text-sm text-gray-500 whitespace-pre-wrap">{result.description}</p>
+                  )}
               </li>
             ))}
           </ul>

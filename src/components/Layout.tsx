@@ -39,7 +39,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col items-center md:flex-row md:justify-between">
             <div className="text-sm text-gray-500">
-              &copy; {new Date().getFullYear()} Made by Areej Dar.
+              &copy; {new Date().getFullYear()} Sadapay.
             </div>
             <div className="mt-4 md:mt-0">
               <p className="text-sm text-gray-500">

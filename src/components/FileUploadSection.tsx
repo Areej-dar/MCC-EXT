@@ -69,11 +69,17 @@ export const FileUploadSection: React.FC<FileUploadSectionProps> = ({
     const formData = new FormData();
     formData.append('file', uploadedFile);
 
+    // try {
+    //   const res = await fetch('http://localhost:8000/risk-assessment/', {
+    //     method: 'POST',
+    //     body: formData,
+    //   });
     try {
-      const res = await fetch('http://localhost:8000/risk-assessment/', {
+      const res = await fetch('http://18.118.197.33:8000/risk-assessment/', {
         method: 'POST',
         body: formData,
       });
+    
 
       const json = await res.json();
       if (!res.ok) throw new Error(json?.error || 'Unknown error');

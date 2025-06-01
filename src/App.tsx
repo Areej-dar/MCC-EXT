@@ -3,7 +3,7 @@ import { Layout } from './components/Layout';
 import { SearchSection, SearchResult, GoogleAPIItem, GeminiAPIItem } from './components/SearchSection';
 import { FileUploadSection } from './components/FileUploadSection';
 import { ReportSection } from './components/ReportSection';
-import { Terminal } from './components/Terminal';
+// import { Terminal } from './components/Terminal';
 
 function App() {
   const [query, setQuery] = useState('');
@@ -16,7 +16,7 @@ function App() {
     riskReport: string | null;
     cleanedFile: string | null;
   } | null>(null);
-  const [terminalOutput, setTerminalOutput] = useState<string[]>([]);
+  // const [terminalOutput, setTerminalOutput] = useState<string[]>([]);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,11 +26,12 @@ function App() {
     }
 
     setIsSearching(true);
-    setTerminalOutput(prev => [...prev, `Searching for: ${query}`]);
+    // setTerminalOutput(prev => [...prev, `Searching for: ${query}`]);
 
     try {
-      const endpoint = activeTab === 'google' ? 'search_google' : 'search_gemini';
-      const res = await fetch(`http://localhost:8000/${endpoint}?q=${encodeURIComponent(query)}`);
+      const endpoint = activeTab === 'google' ? 'search_google' : 'search_openai';
+      //const res = await fetch(`http://localhost:8000/${endpoint}?q=${encodeURIComponent(query)}`);
+      const res = await fetch(`http://18.118.197.33:8000/${endpoint}?q=${encodeURIComponent(query)}`);
       const data = await res.json();
 
       const mapped: SearchResult[] =
@@ -50,10 +51,10 @@ function App() {
             }));
 
       setSearchResults(mapped);
-      setTerminalOutput(prev => [...prev, `Found ${mapped.length} results`]);
+      // setTerminalOutput(prev => [...prev, `Found ${mapped.length} results`]);
     } catch (error) {
       console.error('Search failed:', error);
-      setTerminalOutput(prev => [...prev, 'Error during search']);
+      // setTerminalOutput(prev => [...prev, 'Error during search']);
     } finally {
       setIsSearching(false);
     }
@@ -75,21 +76,20 @@ function App() {
         uploadedFile={uploadedFile}
         onFileUpload={setUploadedFile}
         isProcessing={isProcessing}
-        onTerminalOutput={(msg) => setTerminalOutput(prev => [...prev, msg])}
-        onBackendResponse={(res) =>
-          setGeneratedReport({
-            riskReport: res.risk_report,
-            cleanedFile: res.clean_file
-          })
-        }
-      />
+        // onTerminalOutput={(msg) => setTerminalOutput(prev => [...prev, msg])}
+        onBackendResponse={(res) => setGeneratedReport({
+          riskReport: res.risk_report,
+          cleanedFile: res.clean_file
+        })} onTerminalOutput={function (): void {
+          throw new Error('Function not implemented.');
+        } }      />
 
       <ReportSection
         generatedReport={generatedReport}
         isProcessing={isProcessing}
       />
 
-      <Terminal output={terminalOutput} />
+      {/* <Terminal output={terminalOutput} /> */}
     </Layout>
   );
 }
